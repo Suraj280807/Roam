@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Bookmark, PenLine, Trash2 } from "lucide-react";
+import { Bookmark, PenLine, Trash2, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, ScreenHeader } from "@/components/AppShell";
 import { RowCard } from "@/components/PlaceCard";
@@ -37,8 +37,22 @@ function Journal() {
 
   return (
     <AppShell>
-      <ScreenHeader title="Journal" subtitle="Your story"
-        right={<button onClick={() => { setTab("memories"); setWriting(true); }} className="flex items-center gap-1 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"><PenLine className="h-3.5 w-3.5" />New note</button>} />
+      <ScreenHeader title="My Story" subtitle="Journal"
+        right={
+          <div className="flex gap-2">
+            <label className="flex cursor-pointer items-center gap-1 rounded-full bg-secondary px-4 py-2 text-xs font-bold text-secondary-foreground hover:bg-secondary/80">
+              <Camera className="h-3.5 w-3.5" /> Capture
+              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  toast.success("Photo captured!");
+                }
+              }} />
+            </label>
+            <button onClick={() => { setTab("memories"); setWriting(true); }} className="flex items-center gap-1 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/90">
+              <PenLine className="h-3.5 w-3.5" /> New note
+            </button>
+          </div>
+        } />
 
       <div className="mx-5 flex rounded-full bg-card p-1 shadow-card" role="tablist">
         {(["memories", "saved"] as const).map((t) => (
