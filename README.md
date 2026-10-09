@@ -11,24 +11,31 @@ Instead of simply showing users where to go, Roam helps them understand **why a 
 ## ✨ Key Features
 
 ### 📍 Real-Time Discovery
+
 Discover nearby landmarks, tourist attractions, and hidden gems based on your location and interests.
 
 ### 🤖 AI-Powered Travel Guide
+
 Explore historical facts, cultural significance, local stories, and interesting insights about destinations.
 
 ### 📸 AI Landmark Recognition
+
 Identify landmarks through camera-based exploration and learn more about the places around you.
 
 ### 🗺️ Interactive Exploration
+
 Explore destinations through map-based discovery and contextual location information.
 
 ### 🏆 Travel Passport & Stamps
+
 Collect digital travel stamps, track discoveries, and celebrate your exploration achievements.
 
 ### 📔 Digital Travel Journal
+
 Build a personalized record of visited places, saved destinations, and memorable experiences.
 
 ### 🔔 Smart Travel Notifications
+
 Receive relevant travel information and location-based updates while exploring.
 
 ---
@@ -59,15 +66,15 @@ Every destination becomes an opportunity to learn something new, discover someth
 
 The technology stack depends on the current implementation and integrations.
 
-| Component | Technology |
-|---|---|
-| Frontend | React, TypeScript |
-| Styling | Tailwind CSS |
-| Development | Lovable / Antigravity |
-| Version Control | Git and GitHub |
-| Maps and Places | Maps and location APIs |
-| AI Insights | AI APIs |
-| Data Storage | To be determined by implementation |
+| Component       | Technology                         |
+| --------------- | ---------------------------------- |
+| Frontend        | React, TypeScript                  |
+| Styling         | Tailwind CSS                       |
+| Development     | Antigravity                        |
+| Version Control | Git and GitHub                     |
+| Maps and Places | Maps and location APIs             |
+| AI Insights     | AI APIs                            |
+| Data Storage    | To be determined by implementation |
 
 *Note: This table describes the intended web prototype stack and planned integrations. Update it as the implementation evolves; not every listed service is necessarily integrated yet.*
 
@@ -89,6 +96,7 @@ The technology stack depends on the current implementation and integrations.
 Our vision is to make travel more interactive, informative, and memorable by combining location-aware discovery, AI-generated insights, and gamification.
 
 ### Future Possibilities
+
 - Personalized AI destination recommendations
 - Social exploration and shared achievements
 - Advanced augmented-reality experiences
