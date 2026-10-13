@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ChevronDown, Gem, LocateFixed, MapPin, Search, Sparkles, User, X } from "lucide-react";
+import { ChevronDown, Gem, LocateFixed, MapPin, Search, Sparkles, User, Utensils, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { FeaturedCard, RowCard } from "@/components/PlaceCard";
-import { CATEGORIES, PLACES, type Category } from "@/lib/places";
+import { CATEGORIES, getPlacesForLocation, type Category } from "@/lib/places";
 import { useStore } from "@/lib/store";
 import { resolveCurrentLocation } from "@/lib/location";
 import { toast } from "sonner";
@@ -32,13 +32,35 @@ function Discover() {
   const [locOpen, setLocOpen] = useState(false);
   const [locating, setLocating] = useState(false);
 
-  const filtered = useMemo(() => PLACES.filter((p) =>
+  const activePlaces = useMemo(() => {
+    return getPlacesForLocation(location);
+  }, [location]);
+
+  const filtered = useMemo(() => activePlaces.filter((p) =>
     (cat === "All" || p.category === cat) &&
     (q === "" || `${p.name} ${p.area} ${p.category} ${p.tagline}`.toLowerCase().includes(q.toLowerCase()))
-  ), [q, cat]);
+  ), [activePlaces, q, cat]);
+
   const searching = q !== "" || cat !== "All";
-  const nearby = [...PLACES].sort((a, b) => a.distanceKm - b.distanceKm).slice(0, 3);
-  const forYou = PLACES.filter((p) => interests.includes(p.category)).slice(0, 2);
+
+  // Nearby: non-food landmarks sorted by distance (SGU first, Ramling second in current location)
+  const nearby = useMemo(() => {
+    const nonFood = activePlaces.filter((p) => p.category !== "Food");
+    return (nonFood.length > 0 ? nonFood : activePlaces).sort((a, b) => a.distanceKm - b.distanceKm);
+  }, [activePlaces]);
+
+  // Food section: Cafe Amigo's & The Tea Toast Co.
+  const foodPlaces = useMemo(() => {
+    return activePlaces.filter((p) => p.category === "Food");
+  }, [activePlaces]);
+
+  const featured = useMemo(() => {
+    return activePlaces.filter((p) => p.featured);
+  }, [activePlaces]);
+
+  const forYou = useMemo(() => {
+    return activePlaces.filter((p) => interests.includes(p.category)).slice(0, 2);
+  }, [activePlaces, interests]);
 
   const handleUseCurrentLocation = async () => {
     try {
@@ -128,25 +150,38 @@ function Discover() {
         </section>
       ) : (
         <>
-          <Section title="Featured destinations">
-            <div className="no-scrollbar -mx-5 flex gap-4 overflow-x-auto px-5 pb-2">
-              {PLACES.filter((p) => p.featured).map((p) => <FeaturedCard key={p.id} place={p} />)}
-            </div>
-          </Section>
+          {featured.length > 0 && (
+            <Section title="Featured destinations">
+              <div className="no-scrollbar -mx-5 flex gap-4 overflow-x-auto px-5 pb-2">
+                {featured.map((p) => <FeaturedCard key={p.id} place={p} />)}
+              </div>
+            </Section>
+          )}
+
           <Section title="Nearby now" action={<Link to="/explore" className="text-xs font-bold text-primary">See map</Link>}>
             <div className="space-y-3">{nearby.map((p) => <RowCard key={p.id} place={p} />)}</div>
           </Section>
-          <Section title="Hidden gems" icon={<Gem className="h-4 w-4 text-gold" />}>
-            <div className="grid grid-cols-2 gap-3">
-              {PLACES.filter((p) => p.hiddenGem).map((p) => (
-                <Link key={p.id} to="/place/$id" params={{ id: p.id }} className="relative h-44 overflow-hidden rounded-2xl shadow-card last:odd:col-span-2">
-                  <img src={p.image} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-photo-fade" />
-                  <p className="absolute bottom-3 left-3 right-3 font-display text-sm font-semibold leading-tight text-on-photo">{p.name}</p>
-                </Link>
-              ))}
-            </div>
-          </Section>
+
+          {foodPlaces.length > 0 && (
+            <Section title="Food & Cafés" icon={<Utensils className="h-4 w-4 text-primary" />}>
+              <div className="space-y-3">{foodPlaces.map((p) => <RowCard key={p.id} place={p} />)}</div>
+            </Section>
+          )}
+
+          {activePlaces.some((p) => p.hiddenGem) && (
+            <Section title="Hidden gems" icon={<Gem className="h-4 w-4 text-gold" />}>
+              <div className="grid grid-cols-2 gap-3">
+                {activePlaces.filter((p) => p.hiddenGem).map((p) => (
+                  <Link key={p.id} to="/place/$id" params={{ id: p.id }} className="relative h-44 overflow-hidden rounded-2xl shadow-card last:odd:col-span-2">
+                    <img src={p.image} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                    <div className="absolute inset-0 bg-photo-fade" />
+                    <p className="absolute bottom-3 left-3 right-3 font-display text-sm font-semibold leading-tight text-on-photo">{p.name}</p>
+                  </Link>
+                ))}
+              </div>
+            </Section>
+          )}
+
           {forYou.length > 0 && (
             <Section title="Picked for you" icon={<Sparkles className="h-4 w-4 text-gold" />}>
               <div className="space-y-3">

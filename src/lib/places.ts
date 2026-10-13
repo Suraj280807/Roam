@@ -6,6 +6,11 @@ import lxfactory from "@/assets/lxfactory.jpg";
 import miradouro from "@/assets/miradouro.jpg";
 import pasteis from "@/assets/pasteis.jpg";
 
+import sgu from "@/assets/sgu.jpg";
+import ramling from "@/assets/ramling.jpg";
+import cafeAmigos from "@/assets/cafe-amigos.png";
+import teaToastCo from "@/assets/tea-toast-co.png";
+
 export type Category = "Landmarks" | "History" | "Viewpoints" | "Food" | "Culture";
 export const CATEGORIES: Category[] = ["Landmarks", "History", "Viewpoints", "Food", "Culture"];
 
@@ -28,7 +33,133 @@ export interface Place {
   qa: Record<string, string>;
 }
 
-export const PLACES: Place[] = [
+/**
+ * Places for CURRENT LOCATION (Kolhapur / SGU region)
+ */
+export const CURRENT_PLACES: Place[] = [
+  {
+    id: "sgu",
+    name: "Sanjay Ghodawat University",
+    area: "Atigre, Kolhapur",
+    category: "Landmarks",
+    image: sgu,
+    distanceKm: 0.8,
+    duration: "1–2 hrs",
+    rating: 4.9,
+    tagline: "A world-class university campus nestled in scenic green landscapes.",
+    history:
+      "Founded by the visionary Sanjay Ghodawat Group, SGU has rapidly evolved into one of Maharashtra's premier educational institutions, pioneering modern research, engineering, and arts education.",
+    culture:
+      "A vibrant, thriving hub of student activity, cultural festivals, academic symposiums, and sports championships, set against lush green grounds and modern architectural faculties.",
+    facts: [
+      "Sprawls across an expansive eco-friendly campus with modern university faculties.",
+      "Features state-of-the-art sports facilities, hostels, amphitheaters, and research labs.",
+      "Known for vibrant annual tech fests, cultural concerts, and student gatherings."
+    ],
+    featured: true,
+    map: { x: 45, y: 35 },
+    qa: {
+      "What is SGU best known for?":
+        "Excellence in technology, management, modern student amenities, and high university placements.",
+      "When is the best time to visit?":
+        "Weekdays during daytime to witness the energetic campus atmosphere and central amenities.",
+      "What can I see on campus?":
+        "Explore the iconic central building, lush tree-lined walkways, sports grounds, and vibrant student cafeterias."
+    }
+  },
+  {
+    id: "ramling",
+    name: "Ramling Temple",
+    area: "Hatkanangle, Kolhapur",
+    category: "History",
+    image: ramling,
+    distanceKm: 2.4,
+    duration: "45 min – 1 hr",
+    rating: 4.8,
+    tagline: "Ancient cave temple dedicated to Lord Shiva with holy natural spring ponds.",
+    history:
+      "Steeped in epic heritage, local tradition recounts that Lord Rama consecrated and prayed to Lord Shiva here during his exile. The temple complex is renowned for its historic rock-cut sanctum and sacred water kunds.",
+    culture:
+      "A peaceful spiritual retreat nestled at the base of green hills. Devotees and travelers visit to meditate by the cool natural spring waters and seek sacred blessings.",
+    facts: [
+      "Features ancient stone kunds (tanks) filled with perennial, cool natural spring water.",
+      "Surrounded by serene hill trails, offering tranquil panoramic viewpoints of the valley.",
+      "Draws thousands of pilgrims and celebratory processions during Mahashivratri."
+    ],
+    featured: true,
+    hiddenGem: true,
+    map: { x: 65, y: 55 },
+    qa: {
+      "What is the story of Ramling?":
+        "Believed to have been visited by Lord Rama in Treta Yuga, who carved and worshipped a Shiva lingam beside the natural stream.",
+      "When should I visit?":
+        "Mornings and late afternoons offer cool breezes, chanting echoes, and serene reflections in the temple water.",
+      "What should I explore?":
+        "The inner rock shrine, the holy temple kunds, and the peaceful hillside stone walkways."
+    }
+  },
+  {
+    id: "cafe-amigos",
+    name: "Café Amigo's",
+    area: "Near SGU Campus, Kolhapur",
+    category: "Food",
+    image: cafeAmigos,
+    distanceKm: 1.2,
+    duration: "30–45 min",
+    rating: 4.7,
+    tagline: "Lively outdoor hangout for loaded burgers, iced coffees & chill vibes.",
+    history:
+      "Started as a welcoming hangout spot for university students, locals, and road travelers looking for delicious fast food and cozy evening conversations.",
+    culture:
+      "Warm ambient lighting under a white canopy tent, comfortable open-air seating, and upbeat music that makes it a favorite evening destination for friends.",
+    facts: [
+      "Famous for handcrafted cheesy burgers, peri-peri loaded fries, and signature shakes.",
+      "Popular evening hangout hub for SGU students after classes and study sessions.",
+      "Features outdoor covered patio seating with great nightlife vibes."
+    ],
+    featured: false,
+    map: { x: 38, y: 42 },
+    qa: {
+      "What are the top picks on the menu?":
+        "Their Amigo's special burger, spicy cheese fries, hazelnut cold coffee, and paneer wraps.",
+      "What is the vibe like?":
+        "Casual, youthful, and lively with outdoor canopy seating that glows nicely in the evening."
+    }
+  },
+  {
+    id: "tea-toast-co",
+    name: "The Tea Toast Co.",
+    area: "Campus Promenade, Kolhapur",
+    category: "Food",
+    image: teaToastCo,
+    distanceKm: 1.5,
+    duration: "20–35 min",
+    rating: 4.8,
+    tagline: "Artisanal crunchy toasts, kulhad tea, and cozy café comforting bites.",
+    history:
+      "Created to elevate classic Indian street tea culture with gourmet toasties and modern café hospitality in a sleek glass pavilion.",
+    culture:
+      "A sunny, modern glasshouse café with outdoor bistro tables, artistic wall murals, and the comforting fragrance of steaming cardamom chai.",
+    facts: [
+      "Famous for piping hot masala tea served in traditional clay kulhads.",
+      "Serves an extensive menu of savory melt-in-the-mouth toasts, from cheese chilli to garlic herb.",
+      "Spacious glass pavilion design with breezy patio seating."
+    ],
+    featured: true,
+    map: { x: 50, y: 40 },
+    qa: {
+      "What are the must-try items?":
+        "Order the Signature Kulhad Chai, Cheese Chilli Toast, and fresh potato wedges.",
+      "Is it good for quick catch-ups?":
+        "Perfect for quick study chats, breakfast toasties, or a relaxing evening tea break."
+    }
+  }
+];
+
+/**
+ * Places for DEMO LOCATION (Lisbon)
+ */
+export const DEMO_PLACES: Place[] = [
   {
     id: "belem-tower",
     name: "Belém Tower",
@@ -65,87 +196,87 @@ export const PLACES: Place[] = [
     area: "Belém",
     category: "History",
     image: jeronimos,
-    distanceKm: 5.9,
+    distanceKm: 5.7,
     duration: "1.5–2 hrs",
     rating: 4.8,
-    tagline: "Lace-like stone cloisters funded by the spice trade.",
+    tagline: "Cloisters carved from limestone, funded by the spice trade.",
     history:
-      "Founded in 1501, the monastery was financed by a tax on spices brought from Africa and Asia. Vasco da Gama's tomb rests inside, alongside the poet Luís de Camões.",
+      "Founded in 1501 to celebrate Vasco da Gama's return from India, the monastery took a century to complete, funded by a 5% tax on eastern spices like pepper, cinnamon and cloves.",
     culture:
-      "Hieronymite monks once prayed here for sailors' souls. Today it symbolises Portugal's Age of Discovery and is the venue where the EU's Lisbon Treaty was signed in 2007.",
+      "The cloisters are widely considered Portugal's crowning architectural achievement. Vasco da Gama and the poet Luís de Camões lie buried here in carved stone tombs.",
     facts: [
-      "The two-storey cloister survived the 1755 earthquake almost intact.",
-      "Construction took roughly 100 years.",
-      "The monks are credited with inventing the original pastel de nata recipe.",
+      "Surviving the 1755 earthquake with almost no damage, the monks credited its divine construction.",
+      "The south portal features over 40 intricate statues carved by master João de Castilho.",
+      "It housed the Order of Saint Jerome until 1833.",
     ],
     featured: true,
-    map: { x: 18, y: 62 },
+    map: { x: 16, y: 68 },
     qa: {
       "Who is buried here?":
-        "Vasco da Gama, the navigator who reached India by sea in 1498, and Luís de Camões, author of Portugal's national epic Os Lusíadas, both lie in ornate tombs near the church entrance.",
-      "Best time to visit?":
-        "Weekday mornings are calmest. The church is free; the cloister requires a ticket. Combine it with Belém Tower and a stop for pastries.",
-      "What is Manueline style?":
-        "It's a Portuguese late-Gothic style full of maritime symbols — coral, ropes, seaweed and armillary spheres — celebrating the nation's ocean voyages.",
+        "Explorer Vasco da Gama, poet Luís de Camões, and writer Fernando Pessoa (in the cloister). Several Portuguese monarchs also rest in the chancel.",
+      "How do I avoid queues?":
+        "Buy tickets online in advance and visit early morning. The church (Santa Maria de Belém) is free to enter, but cloisters require a ticket.",
+      "What makes the architecture special?":
+        "The delicate Manueline vaulted ceilings seem to float with no visible central supports — an engineering marvel of the 16th century.",
     },
   },
   {
     id: "alfama",
-    name: "Alfama Quarter",
+    name: "Alfama Old Quarter",
     area: "Alfama",
     category: "Culture",
     image: alfama,
     distanceKm: 0.9,
     duration: "2–3 hrs",
     rating: 4.6,
-    tagline: "Lisbon's oldest neighbourhood, where fado drifts from doorways.",
+    tagline: "A labyrinth of alleys, laundry lines and evening fado.",
     history:
-      "Alfama's tangled lanes date to Moorish rule — its name comes from the Arabic al-hamma, meaning hot springs. Built on dense bedrock, it largely survived the great earthquake of 1755.",
+      "Lisbon's oldest neighbourhood, Alfama derives its name from the Arabic 'al-hamma' (hot springs). Its narrow, winding medieval layout survived the 1755 earthquake almost intact.",
     culture:
-      "This is the heartland of fado, the soulful music of longing. In June, the Santo António festival fills every alley with grilled sardines, garlands and dancing.",
+      "The spiritual cradle of fado — Portugal's melancholic folk music. In the evenings, tavern doors open and heartfelt voices carry down cobblestone lanes.",
     facts: [
-      "Tram 28 rattles through some of its narrowest streets.",
-      "Many houses still display traditional azulejo tile façades.",
-      "Fado was added to UNESCO's Intangible Cultural Heritage list in 2011.",
+      "Tram 28 rattles straight through Alfama's tightest curves.",
+      "During June's Santo António festival, the streets fill with grilled sardines, paper garlands and dancing.",
+      "Many alleys are so steep they are built as stone staircases (becos and escadinhas).",
     ],
     featured: true,
-    map: { x: 70, y: 48 },
+    map: { x: 62, y: 44 },
     qa: {
-      "Where can I hear fado?":
-        "Small family-run casas de fado in Alfama host evening performances. Book ahead, arrive around 8–9pm, and keep silent during songs — it's considered respectful.",
-      "Is it walkable?":
-        "Yes, but it's steep with slippery cobblestones. Wear comfortable shoes and consider riding Tram 28 up, then walking down.",
-      "Hidden spots nearby?":
-        "Seek out Largo do Chafariz de Dentro for its fountain square and the tiny Beco do Carneiro alley — one of the narrowest in Lisbon.",
+      "Where can I hear real fado?":
+        "Avoid tourist-trap dinner shows on main streets. Seek small tascas like Mesa de Frades or A Baiuca where locals sing spontaneously ('fado vadio').",
+      "Is it easy to get lost?":
+        "Yes, and that's the point! Keep heading uphill to find the castle or downhill to hit the river.",
+      "Best time to wander?":
+        "Late afternoon as the light softens on pastel walls, staying into the evening for dinner and music.",
     },
   },
   {
-    id: "sao-jorge",
+    id: "castelo",
     name: "São Jorge Castle",
     area: "Castelo",
     category: "History",
     image: castle,
-    distanceKm: 1.1,
+    distanceKm: 0.7,
     duration: "1.5–2 hrs",
     rating: 4.5,
-    tagline: "Moorish ramparts crowning the city's highest hill.",
+    tagline: "Hilltop battlements watching over Lisbon for a thousand years.",
     history:
-      "The hilltop has been fortified since at least the 2nd century BC. The Moors built the current walls in the 11th century; Afonso Henriques captured it in 1147 during the Reconquista.",
+      "First fortified by the Romans, Visigoths and later the Moors in the 10th century, the citadel fell to King Afonso Henriques during the 1147 Siege of Lisbon with help from passing Crusaders.",
     culture:
-      "The castle was the royal residence until the 16th century. Today peacocks roam its gardens and its terraces offer one of the most beloved views in Lisbon.",
+      "The castle walls offer one of the city's finest 360-degree panoramas. Peacocks roam freely among olive trees in the tranquil inner courtyards.",
     facts: [
-      "The castle has 11 towers.",
-      "A camera obscura in the Tower of Ulysses projects live views of the city.",
-      "Archaeological digs here revealed remains from the Iron Age.",
+      "Eleven towers remain along the perimeter wall.",
+      "The Tower of Ulysses houses a camera obscura providing live optical views of Lisbon.",
+      "Archaeologists have uncovered traces of 7th-century BC Iron Age settlements on this hill.",
     ],
-    map: { x: 64, y: 38 },
+    map: { x: 54, y: 38 },
     qa: {
-      "Is the view worth it?":
-        "Absolutely — the ramparts frame the Tagus, the 25 de Abril bridge and the red rooftops of Baixa. Sunset is especially magical.",
-      "How do I get there?":
-        "Walk uphill from Baixa through Alfama (about 20 minutes), take Tram 28 to Largo das Portas do Sol, or use bus 737.",
-      "Tell me about the peacocks":
-        "Peacocks have lived freely in the castle gardens for decades. They are a beloved quirk — listen for their calls echoing off the walls.",
+      "Is the view worth the climb?":
+        "Absolutely — from the ramparts you can see the Tagus estuary, the bridge, downtown Baixa and across to the Monsanto forest park.",
+      "Is it crowded?":
+        "Lines peak midday. Arrive right at opening (9:00) or 2 hours before closing to enjoy golden hour without tour groups.",
+      "Are there peacocks?":
+        "Yes, dozens of wild peacocks live in the gardens and often perch dramatically on the stone battlements.",
     },
   },
   {
@@ -154,18 +285,18 @@ export const PLACES: Place[] = [
     area: "Alcântara",
     category: "Culture",
     image: lxfactory,
-    distanceKm: 4.4,
-    duration: "1–2 hrs",
-    rating: 4.4,
-    tagline: "A 19th-century textile mill reborn as a creative village.",
+    distanceKm: 3.8,
+    duration: "1.5–2.5 hrs",
+    rating: 4.6,
+    tagline: "A 19th-century textile mill reborn as an arts & dining village.",
     history:
-      "Founded in 1846 as a fabric and thread complex, the site later housed printers and industrial workshops before standing empty for decades.",
+      "Founded in 1846 as the Companhia de Fiação e Tecidos Lisbonense, this 23,000-square-metre industrial site was abandoned for decades before creatives transformed it in 2008.",
     culture:
-      "Since 2008 it has been a creative hub of studios, design shops, street art and restaurants. Its bookstore, Ler Devagar, fills a former printing hall.",
+      "A creative hub filled with design studios, mural art, independent bookshops, vintage boutiques, rooftop cocktail bars and open-air food courts beneath the 25 de Abril Bridge.",
     facts: [
-      "Ler Devagar features a flying bicycle sculpture above the shelves.",
-      "A Sunday market brings vintage finds and local crafts.",
-      "It sits right beneath the 25 de Abril bridge.",
+      "Ler Devagar is celebrated as one of the world's most beautiful bookstores, with a flying bicycle sculpture suspended from the ceiling.",
+      "Street artists from around the world have painted massive murals across the brick facades.",
+      "Every Sunday it hosts a lively open-air vintage and design flea market.",
     ],
     hiddenGem: true,
     map: { x: 32, y: 66 },
@@ -240,7 +371,24 @@ export const PLACES: Place[] = [
   },
 ];
 
-export const getPlace = (id: string) => PLACES.find((p) => p.id === id);
+export const ALL_PLACES: Place[] = [...CURRENT_PLACES, ...DEMO_PLACES];
+
+/**
+ * Returns places for the given location mode:
+ * - "device" / current location: CURRENT_PLACES (SGU, Ramling, Café Amigo's, The Tea Toast Co.)
+ * - "demo": DEMO_PLACES (Lisbon)
+ */
+export function getPlacesForLocation(mode: "demo" | "device" | "unset"): Place[] {
+  if (mode === "demo") {
+    return DEMO_PLACES;
+  }
+  // Default to CURRENT_PLACES for current location / device mode
+  return CURRENT_PLACES;
+}
+
+// Global lookup and defaults
+export const PLACES = ALL_PLACES;
+export const getPlace = (id: string) => ALL_PLACES.find((p) => p.id === id);
 
 export const GENERIC_QUESTIONS = ["Tell me a story", "Fun fact?", "Nearby food?"];
 
@@ -253,10 +401,10 @@ export function demoAnswer(place: Place, question: string): string {
   if (q.includes("fact") || q.includes("interesting"))
     return place.facts[Math.floor(Math.random() * place.facts.length)];
   if (q.includes("food") || q.includes("eat"))
-    return `Near ${place.name}, look for a traditional tasca serving bacalhau, grilled sardines and a glass of vinho verde. In ${place.area}, small family places usually beat the busy main streets.`;
+    return `Near ${place.name}, check out Café Amigo's and The Tea Toast Co. for delicious burgers, teas, and snacks.`;
   if (q.includes("culture") || q.includes("meaning") || q.includes("signific"))
     return place.culture;
   if (q.includes("time") || q.includes("long") || q.includes("duration"))
-    return `Plan about ${place.duration} at ${place.name}. Mornings are typically quieter.`;
-  return `Here's what I know about ${place.name}: ${place.tagline} ${place.culture} Try asking about its history, best visiting time, or a fun fact.`;
+    return `Plan about ${place.duration} at ${place.name}.`;
+  return `Here's what I know about ${place.name}: ${place.tagline} ${place.culture}`;
 }
