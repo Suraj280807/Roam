@@ -1,12 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
-export interface Note { id: string; placeId: string; text: string; date: string }
+export interface Note { id: string; placeId: string; text: string; date: string; image?: string }
 export interface Stamp { placeId: string; date: string }
+export interface PhotoMemory { id: string; image: string; caption?: string; placeId?: string; date: string }
 interface State {
   name: string;
   saved: string[];
   stamps: Stamp[];
   notes: Note[];
+  memories: PhotoMemory[];
   interests: string[];
   location: "unset" | "demo" | "device";
   city: string;
@@ -17,6 +19,7 @@ const DEFAULT: State = {
   saved: [],
   stamps: [],
   notes: [],
+  memories: [],
   interests: ["History", "Viewpoints"],
   location: "unset",
   city: "Lisbon",
@@ -27,8 +30,10 @@ interface Ctx extends State {
   ready: boolean;
   toggleSave: (id: string) => void;
   collectStamp: (id: string) => boolean;
-  addNote: (placeId: string, text: string) => void;
+  addNote: (placeId: string, text: string, image?: string) => void;
   deleteNote: (id: string) => void;
+  addPhotoMemory: (memory: { image: string; caption?: string; placeId?: string }) => void;
+  deletePhotoMemory: (id: string) => void;
   update: (p: Partial<State>) => void;
   reset: () => void;
 }
@@ -41,7 +46,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) setState({ ...DEFAULT, ...JSON.parse(raw) });
+      if (raw) setState({ ...DEFAULT, memories: [], ...JSON.parse(raw) });
     } catch { /* ignore corrupt data */ }
     setReady(true);
   }, []);
@@ -63,14 +68,36 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return added;
   }, []);
 
-  const addNote = useCallback((placeId: string, text: string) =>
-    setState((s) => ({ ...s, notes: [{ id: crypto.randomUUID(), placeId, text, date: new Date().toISOString() }, ...s.notes] })), []);
+  const addNote = useCallback((placeId: string, text: string, image?: string) =>
+    setState((s) => ({ ...s, notes: [{ id: crypto.randomUUID(), placeId, text, image, date: new Date().toISOString() }, ...s.notes] })), []);
   const deleteNote = useCallback((id: string) => setState((s) => ({ ...s, notes: s.notes.filter((n) => n.id !== id) })), []);
+
+  const addPhotoMemory = useCallback((memory: { image: string; caption?: string; placeId?: string }) =>
+    setState((s) => ({
+      ...s,
+      memories: [
+        {
+          id: crypto.randomUUID(),
+          image: memory.image,
+          caption: memory.caption,
+          placeId: memory.placeId,
+          date: new Date().toISOString(),
+        },
+        ...(s.memories || []),
+      ],
+    })), []);
+
+  const deletePhotoMemory = useCallback((id: string) =>
+    setState((s) => ({
+      ...s,
+      memories: (s.memories || []).filter((m) => m.id !== id),
+    })), []);
+
   const update = useCallback((p: Partial<State>) => setState((s) => ({ ...s, ...p })), []);
   const reset = useCallback(() => setState(DEFAULT), []);
 
   return (
-    <StoreCtx.Provider value={{ ...state, ready, toggleSave, collectStamp, addNote, deleteNote, update, reset }}>
+    <StoreCtx.Provider value={{ ...state, ready, toggleSave, collectStamp, addNote, deleteNote, addPhotoMemory, deletePhotoMemory, update, reset }}>
       {children}
     </StoreCtx.Provider>
   );
