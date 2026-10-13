@@ -56,8 +56,9 @@ function Journal() {
       setPhotoImage(compressed);
       setAddingPhoto(true);
       toast.success("Photo loaded!");
-    } catch {
-      toast.error("Failed to process image");
+    } catch (err: any) {
+      console.error("Photo selection error:", err);
+      toast.error(err?.message || "Could not load this photo. Please try another image.");
     } finally {
       setIsProcessingImage(false);
       if (e.target) e.target.value = "";
@@ -74,8 +75,9 @@ function Journal() {
       const compressed = await compressImage(file);
       setNoteImage(compressed);
       toast.success("Photo attached to note!");
-    } catch {
-      toast.error("Failed to process image");
+    } catch (err: any) {
+      console.error("Note photo error:", err);
+      toast.error(err?.message || "Could not load this photo. Please try another image.");
     } finally {
       setIsProcessingImage(false);
       if (e.target) e.target.value = "";
@@ -486,15 +488,25 @@ function Journal() {
             </div>
 
             <div className="mt-4 space-y-3">
-              {photoImage && (
+              {photoImage ? (
                 <div className="relative overflow-hidden rounded-2xl bg-muted">
                   <img src={photoImage} alt="Preview" className="h-48 w-full object-cover" />
                   <button
+                    type="button"
                     onClick={() => photoInputRef.current?.click()}
                     className="absolute bottom-2 right-2 rounded-full bg-black/60 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm hover:bg-black/80"
                   >
                     Change photo
                   </button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => photoInputRef.current?.click()}
+                  className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/40 p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                >
+                  <Camera className="h-8 w-8 text-primary mb-2" />
+                  <span className="text-xs font-semibold text-foreground">Tap to select or take photo</span>
+                  <span className="text-[10px] text-muted-foreground mt-0.5">JPG, PNG, WebP supported</span>
                 </div>
               )}
 
