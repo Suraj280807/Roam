@@ -36,7 +36,7 @@ function Explore() {
     <AppShell>
       <ScreenHeader
         title="Explore"
-        subtitle={location === "device" ? `${city || "Live Location"} · GPS` : "Lisbon · demo map"}
+        subtitle={location === "demo" ? "Lisbon · demo map" : `${city && city !== "Lisbon" ? city : "Kolhapur"} · GPS`}
         right={
           <div role="tablist" className="flex rounded-full bg-card p-1 shadow-card">
             {(["map", "list"] as const).map((v) => (
@@ -60,7 +60,7 @@ function Explore() {
               <path d="M5 70 L 95 40" className="stroke-gold" strokeWidth="0.5" strokeDasharray="1.5 1" fill="none" />
             </svg>
             <span className="absolute bottom-3 left-3 rounded-full bg-background/80 px-2 py-1 text-[10px] font-semibold text-muted-foreground">
-              {location === "device" ? "Kolhapur Region" : "Tagus River"}
+              {location === "demo" ? "Tagus River" : "Kolhapur Region"}
             </span>
             <div className="absolute" style={{ left: "52%", top: "55%" }} aria-label="You are here">
               <span className="absolute -left-2 -top-2 h-4 w-4 rounded-full bg-primary/40 animate-pulse-ring" />

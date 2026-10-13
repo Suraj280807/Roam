@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { Bookmark, PenLine, Trash2, Camera, Plus, X, Image as ImageIcon, MapPin, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, ScreenHeader } from "@/components/AppShell";
 import { RowCard } from "@/components/PlaceCard";
-import { getPlace, PLACES } from "@/lib/places";
+import { getPlace, getPlacesForLocation } from "@/lib/places";
 import { fmtDate, useStore, type PhotoMemory } from "@/lib/store";
 import { compressImage } from "@/lib/image";
 
@@ -21,12 +21,13 @@ export const Route = createFileRoute("/journal")({
 });
 
 function Journal() {
-  const { saved, stamps, notes, memories = [], addNote, deleteNote, addPhotoMemory, deletePhotoMemory } = useStore();
+  const { saved, stamps, notes, memories = [], location, addNote, deleteNote, addPhotoMemory, deletePhotoMemory } = useStore();
+  const places = useMemo(() => getPlacesForLocation(location), [location]);
   const [tab, setTab] = useState<"memories" | "saved">("memories");
 
   // New Note state
   const [writing, setWriting] = useState(false);
-  const [notePlaceId, setNotePlaceId] = useState(PLACES[0].id);
+  const [notePlaceId, setNotePlaceId] = useState(places[0]?.id || "sgu");
   const [noteText, setNoteText] = useState("");
   const [noteImage, setNoteImage] = useState<string | null>(null);
 
@@ -34,8 +35,17 @@ function Journal() {
   const [addingPhoto, setAddingPhoto] = useState(false);
   const [photoImage, setPhotoImage] = useState<string | null>(null);
   const [photoCaption, setPhotoCaption] = useState("");
-  const [photoPlaceId, setPhotoPlaceId] = useState(PLACES[0].id);
+  const [photoPlaceId, setPhotoPlaceId] = useState(places[0]?.id || "sgu");
   const [isProcessingImage, setIsProcessingImage] = useState(false);
+
+  useEffect(() => {
+    if (!places.some((p) => p.id === notePlaceId)) {
+      setNotePlaceId(places[0]?.id || "");
+    }
+    if (!places.some((p) => p.id === photoPlaceId)) {
+      setPhotoPlaceId(places[0]?.id || "");
+    }
+  }, [places]);
 
   // Active Lightbox Photo
   const [viewingPhoto, setViewingPhoto] = useState<PhotoMemory | null>(null);
@@ -190,7 +200,7 @@ function Journal() {
                 onChange={(e) => setNotePlaceId(e.target.value)}
                 className="mt-1 w-full rounded-xl border bg-background px-3 py-2 text-sm"
               >
-                {PLACES.map((p) => (
+                {places.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
@@ -519,7 +529,7 @@ function Journal() {
                   onChange={(e) => setPhotoPlaceId(e.target.value)}
                   className="mt-1 w-full rounded-xl border bg-background px-3 py-2 text-sm"
                 >
-                  {PLACES.map((p) => (
+                  {places.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
                     </option>

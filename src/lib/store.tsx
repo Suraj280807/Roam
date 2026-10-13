@@ -23,10 +23,10 @@ const DEFAULT: State = {
   notes: [],
   memories: [],
   interests: ["History", "Viewpoints"],
-  location: "unset",
-  city: "Lisbon",
-  userCoords: { lat: 38.7115, lng: -9.1395 },
-  resolvedAddress: "Baixa Pombalina, Lisbon",
+  location: "device",
+  city: "Kolhapur",
+  userCoords: { lat: 16.746, lng: 74.372 },
+  resolvedAddress: "Sanjay Ghodawat University, Kolhapur",
 };
 const KEY = "roam-state-v1";
 
@@ -52,7 +52,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) setState({ ...DEFAULT, memories: [], ...JSON.parse(raw) });
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.location === "unset") {
+          parsed.location = "device";
+          if (parsed.city === "Lisbon") parsed.city = "Kolhapur";
+        }
+        setState({ ...DEFAULT, memories: [], ...parsed });
+      }
     } catch { /* ignore corrupt data */ }
     setReady(true);
   }, []);

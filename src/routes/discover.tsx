@@ -92,9 +92,9 @@ function Discover() {
         <div>
           <p className="text-sm text-muted-foreground">{greeting()}, {name}</p>
           <button onClick={() => setLocOpen(true)} className="mt-0.5 flex items-center gap-1.5 font-display text-2xl font-semibold hover:opacity-80 transition-opacity">
-            <MapPin className="h-5 w-5 text-primary" /> {city || "Lisbon"}
+            <MapPin className="h-5 w-5 text-primary" /> {location === "demo" ? "Lisbon" : (city && city !== "Lisbon" ? city : "Kolhapur")}
             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
-              {location === "device" ? "Live GPS" : "Demo"}
+              {location === "demo" ? "Demo" : "Live GPS"}
             </span>
             <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </button>
