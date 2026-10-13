@@ -46,9 +46,13 @@ function Discover() {
       const res = await resolveCurrentLocation();
       setDeviceLocation(res.coords, res.city, res.address);
       setLocOpen(false);
-      toast.success(`Current location set: ${res.city}`);
+      if (res.source === "ip") {
+        toast.info(`Location set: ${res.city} (Network Estimated).`);
+      } else {
+        toast.success(`Current location set: ${res.city}`);
+      }
     } catch (err: any) {
-      toast.error(err?.message || "Could not access current location.");
+      toast.error(err?.message || "Could not access location.");
     } finally {
       setLocating(false);
     }
@@ -227,6 +231,10 @@ function Discover() {
                 >
                   {location === "demo" ? "Using Demo Location" : "Switch to Demo Location"}
                 </button>
+              </div>
+
+              <div className="rounded-xl bg-muted/50 p-2.5 text-[11px] text-muted-foreground border">
+                💡 <strong>iPhone Tip:</strong> If GPS is blocked, Roam automatically detects your city via network, or you can enable GPS by tapping the icon in your address bar → <em>Website Settings</em> → <em>Location: Allow</em>.
               </div>
             </div>
           </div>

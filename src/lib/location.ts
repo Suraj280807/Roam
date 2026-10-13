@@ -11,7 +11,7 @@ export interface LocationResult {
   city: string;
   address: string;
   coords: { lat: number; lng: number };
-  source: "google" | "fallback" | "demo";
+  source: "google" | "fallback" | "demo" | "ip";
 }
 
 /**
@@ -42,7 +42,7 @@ export async function fetchCurrentPosition(): Promise<{ lat: number; lng: number
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 8000,
         maximumAge: 30000,
       }
     );
@@ -128,28 +128,87 @@ export async function reverseGeocodeFallback(
 }
 
 /**
- * Resolves current user location: GPS -> Google Maps Geocoding -> Fallback
+ * IP-based geolocation fallback when GPS permission is denied on mobile devices.
  */
-export async function resolveCurrentLocation(): Promise<LocationResult> {
-  const coords = await fetchCurrentPosition();
-
-  // Try Google Maps Geocoding first
-  const googleResult = await reverseGeocodeWithGoogle(coords.lat, coords.lng);
-  if (googleResult) {
-    return {
-      coords,
-      city: googleResult.city,
-      address: googleResult.address,
-      source: "google",
-    };
+export async function resolveIpLocation(): Promise<LocationResult | null> {
+  try {
+    const res = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client");
+    if (res.ok) {
+      const data = await res.json();
+      const city = data.city || data.locality || data.principalSubdivision || "Current Area";
+      const country = data.countryName || "";
+      const address = `${city}${country ? `, ${country}` : ""} (Network Location)`;
+      const lat = Number(data.latitude) || 0;
+      const lng = Number(data.longitude) || 0;
+      if (lat !== 0 || lng !== 0) {
+        return {
+          city,
+          address,
+          coords: { lat, lng },
+          source: "ip",
+        };
+      }
+    }
+  } catch (e) {
+    console.warn("IP Geolocation 1 failed:", e);
   }
 
-  // Fallback to OSM/Coordinates
-  const fallbackResult = await reverseGeocodeFallback(coords.lat, coords.lng);
-  return {
-    coords,
-    city: fallbackResult.city,
-    address: fallbackResult.address,
-    source: "fallback",
-  };
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    if (res.ok) {
+      const data = await res.json();
+      const city = data.city || data.region || "Current Area";
+      const country = data.country_name || "";
+      const address = `${city}${country ? `, ${country}` : ""} (Network Location)`;
+      return {
+        city,
+        address,
+        coords: { lat: Number(data.latitude), lng: Number(data.longitude) },
+        source: "ip",
+      };
+    }
+  } catch (e) {
+    console.warn("IP Geolocation 2 failed:", e);
+  }
+
+  return null;
+}
+
+/**
+ * Resolves current user location: GPS -> Google Maps / OSM -> Automatic IP fallback if GPS is denied
+ */
+export async function resolveCurrentLocation(): Promise<LocationResult> {
+  try {
+    const coords = await fetchCurrentPosition();
+
+    // Try Google Maps Geocoding first
+    const googleResult = await reverseGeocodeWithGoogle(coords.lat, coords.lng);
+    if (googleResult) {
+      return {
+        coords,
+        city: googleResult.city,
+        address: googleResult.address,
+        source: "google",
+      };
+    }
+
+    // Fallback to OSM/Coordinates
+    const fallbackResult = await reverseGeocodeFallback(coords.lat, coords.lng);
+    return {
+      coords,
+      city: fallbackResult.city,
+      address: fallbackResult.address,
+      source: "fallback",
+    };
+  } catch (gpsError: any) {
+    console.warn("GPS unavailable or permission denied, using IP fallback:", gpsError);
+
+    // If GPS was blocked or failed, try IP Geolocation so mobile users still get their location!
+    const ipResult = await resolveIpLocation();
+    if (ipResult) {
+      return ipResult;
+    }
+
+    throw gpsError;
+  }
 }
