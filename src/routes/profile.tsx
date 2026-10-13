@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Check, MapPin, RotateCcw } from "lucide-react";
+import { ArrowLeft, Check, LocateFixed, MapPin, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { RowCard } from "@/components/PlaceCard";
 import { CATEGORIES, getPlace } from "@/lib/places";
 import { useStore } from "@/lib/store";
+import { resolveCurrentLocation } from "@/lib/location";
 
 export const Route = createFileRoute("/profile")({
   head: () => ({
@@ -20,8 +21,9 @@ export const Route = createFileRoute("/profile")({
 });
 
 function Profile() {
-  const { name, interests, saved, stamps, notes, location, update, reset } = useStore();
+  const { name, interests, saved, stamps, notes, location, resolvedAddress, setDemoLocation, setDeviceLocation, update, reset } = useStore();
   const [draft, setDraft] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
 
   const toggleInterest = (c: string) =>
     update({ interests: interests.includes(c) ? interests.filter((x) => x !== c) : [...interests, c] });
@@ -65,17 +67,60 @@ function Profile() {
 
       <h2 className="px-5 pt-7 text-lg font-semibold">Location settings</h2>
       <div className="mx-5 mt-3 space-y-2">
-        {([["demo", "Demo location", "Baixa, Lisbon — for the prototype"], ["device", "Device location", "Ask the browser for permission"]] as const).map(([v, t, d]) => (
-          <button key={v} onClick={() => {
-            if (v === "device") {
-              navigator.geolocation?.getCurrentPosition(() => { update({ location: "device" }); toast.success("Device location enabled"); }, () => toast.error("Permission denied — still using demo location"));
-            } else { update({ location: "demo" }); toast("Using demo location"); }
-          }} className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left ${location === v ? "bg-secondary ring-2 ring-primary" : "bg-card shadow-card"}`}>
-            <MapPin className="h-5 w-5 text-primary" />
-            <div className="flex-1"><p className="text-sm font-semibold">{t}</p><p className="text-xs text-muted-foreground">{d}</p></div>
-            {location === v && <Check className="h-4 w-4 text-primary" />}
-          </button>
-        ))}
+        {/* Device GPS / Google Maps Location */}
+        <button
+          onClick={async () => {
+            try {
+              setLocating(true);
+              const res = await resolveCurrentLocation();
+              setDeviceLocation(res.coords, res.city, res.address);
+              toast.success(`Current location enabled: ${res.city}`);
+            } catch (err: any) {
+              toast.error(err?.message || "Could not access location");
+            } finally {
+              setLocating(false);
+            }
+          }}
+          disabled={locating}
+          className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition-all ${
+            location === "device" ? "bg-secondary ring-2 ring-primary" : "bg-card shadow-card"
+          }`}
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <LocateFixed className="h-5 w-5" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">
+              {locating ? "Detecting location..." : "Use Current Location (GPS)"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {location === "device" && resolvedAddress
+                ? resolvedAddress
+                : "Live GPS & Google Maps Geocoding"}
+            </p>
+          </div>
+          {location === "device" && <Check className="h-4 w-4 text-primary" />}
+        </button>
+
+        {/* Demo Location */}
+        <button
+          onClick={() => {
+            setDemoLocation();
+            toast.success("Switched to Demo location: Baixa, Lisbon");
+          }}
+          className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition-all ${
+            location === "demo" ? "bg-secondary ring-2 ring-primary" : "bg-card shadow-card"
+          }`}
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+            <MapPin className="h-5 w-5" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Demo Location</p>
+            <p className="text-xs text-muted-foreground">Baixa Pombalina, Lisbon (prototype)</p>
+          </div>
+          {location === "demo" && <Check className="h-4 w-4 text-primary" />}
+        </button>
       </div>
 
       <h2 className="px-5 pt-7 text-lg font-semibold">Saved destinations</h2>

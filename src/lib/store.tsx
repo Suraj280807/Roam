@@ -12,6 +12,8 @@ interface State {
   interests: string[];
   location: "unset" | "demo" | "device";
   city: string;
+  userCoords?: { lat: number; lng: number };
+  resolvedAddress?: string;
 }
 
 const DEFAULT: State = {
@@ -23,6 +25,8 @@ const DEFAULT: State = {
   interests: ["History", "Viewpoints"],
   location: "unset",
   city: "Lisbon",
+  userCoords: { lat: 38.7115, lng: -9.1395 },
+  resolvedAddress: "Baixa Pombalina, Lisbon",
 };
 const KEY = "roam-state-v1";
 
@@ -34,6 +38,8 @@ interface Ctx extends State {
   deleteNote: (id: string) => void;
   addPhotoMemory: (memory: { image: string; caption?: string; placeId?: string }) => void;
   deletePhotoMemory: (id: string) => void;
+  setDemoLocation: () => void;
+  setDeviceLocation: (coords: { lat: number; lng: number }, city?: string, address?: string) => void;
   update: (p: Partial<State>) => void;
   reset: () => void;
 }
@@ -93,11 +99,31 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       memories: (s.memories || []).filter((m) => m.id !== id),
     })), []);
 
+  const setDemoLocation = useCallback(() => {
+    setState((s) => ({
+      ...s,
+      location: "demo",
+      city: "Lisbon",
+      userCoords: { lat: 38.7115, lng: -9.1395 },
+      resolvedAddress: "Baixa Pombalina, Lisbon",
+    }));
+  }, []);
+
+  const setDeviceLocation = useCallback((coords: { lat: number; lng: number }, city?: string, address?: string) => {
+    setState((s) => ({
+      ...s,
+      location: "device",
+      city: city || s.city || "Current Location",
+      userCoords: coords,
+      resolvedAddress: address || `Lat: ${coords.lat.toFixed(3)}, Lng: ${coords.lng.toFixed(3)}`,
+    }));
+  }, []);
+
   const update = useCallback((p: Partial<State>) => setState((s) => ({ ...s, ...p })), []);
   const reset = useCallback(() => setState(DEFAULT), []);
 
   return (
-    <StoreCtx.Provider value={{ ...state, ready, toggleSave, collectStamp, addNote, deleteNote, addPhotoMemory, deletePhotoMemory, update, reset }}>
+    <StoreCtx.Provider value={{ ...state, ready, toggleSave, collectStamp, addNote, deleteNote, addPhotoMemory, deletePhotoMemory, setDemoLocation, setDeviceLocation, update, reset }}>
       {children}
     </StoreCtx.Provider>
   );

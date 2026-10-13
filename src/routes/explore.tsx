@@ -21,12 +21,14 @@ export const Route = createFileRoute("/explore")({
 function Explore() {
   const [view, setView] = useState<"map" | "list">("map");
   const [sel, setSel] = useState(PLACES[2].id);
-  const { stamps } = useStore();
+  const { stamps, location, city } = useStore();
   const place = PLACES.find((p) => p.id === sel)!;
 
   return (
     <AppShell>
-      <ScreenHeader title="Explore" subtitle="Lisbon · demo map"
+      <ScreenHeader
+        title="Explore"
+        subtitle={location === "device" ? `${city || "Live Location"} · GPS` : "Lisbon · demo map"}
         right={
           <div role="tablist" className="flex rounded-full bg-card p-1 shadow-card">
             {(["map", "list"] as const).map((v) => (

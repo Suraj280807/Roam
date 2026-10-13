@@ -5,14 +5,15 @@ import { AppShell } from "@/components/AppShell";
 import { FeaturedCard, RowCard } from "@/components/PlaceCard";
 import { CATEGORIES, PLACES, type Category } from "@/lib/places";
 import { useStore } from "@/lib/store";
+import { resolveCurrentLocation } from "@/lib/location";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/discover")({
   head: () => ({
     meta: [
-      { title: "Discover Lisbon — Roam" },
+      { title: "Discover Places — Roam" },
       { name: "description", content: "Featured destinations, nearby attractions and hidden gems around you." },
-      { property: "og:title", content: "Discover Lisbon — Roam" },
+      { property: "og:title", content: "Discover Places — Roam" },
       { property: "og:description", content: "Featured destinations, nearby attractions and hidden gems." },
     ],
   }),
@@ -25,10 +26,11 @@ function greeting() {
 }
 
 function Discover() {
-  const { name, location, update, interests, ready } = useStore();
+  const { name, location, city, resolvedAddress, interests, ready, setDemoLocation, setDeviceLocation } = useStore();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<Category | "All">("All");
   const [locOpen, setLocOpen] = useState(false);
+  const [locating, setLocating] = useState(false);
 
   const filtered = useMemo(() => PLACES.filter((p) =>
     (cat === "All" || p.category === cat) &&
@@ -38,12 +40,24 @@ function Discover() {
   const nearby = [...PLACES].sort((a, b) => a.distanceKm - b.distanceKm).slice(0, 3);
   const forYou = PLACES.filter((p) => interests.includes(p.category)).slice(0, 2);
 
-  const useDevice = () => {
-    if (!navigator.geolocation) { toast.error("Location isn't available on this device."); return; }
-    navigator.geolocation.getCurrentPosition(
-      () => { update({ location: "device" }); setLocOpen(false); toast.success("Location enabled — showing Lisbon demo distances."); },
-      () => { toast.error("Permission denied. Using demo location instead."); update({ location: "demo" }); setLocOpen(false); },
-    );
+  const handleUseCurrentLocation = async () => {
+    try {
+      setLocating(true);
+      const res = await resolveCurrentLocation();
+      setDeviceLocation(res.coords, res.city, res.address);
+      setLocOpen(false);
+      toast.success(`Current location set: ${res.city}`);
+    } catch (err: any) {
+      toast.error(err?.message || "Could not access current location.");
+    } finally {
+      setLocating(false);
+    }
+  };
+
+  const handleUseDemoLocation = () => {
+    setDemoLocation();
+    setLocOpen(false);
+    toast.success("Switched to Demo location: Baixa, Lisbon");
   };
 
   return (
@@ -51,8 +65,12 @@ function Discover() {
       <header className="flex items-center justify-between px-5 pt-8">
         <div>
           <p className="text-sm text-muted-foreground">{greeting()}, {name}</p>
-          <button onClick={() => setLocOpen(true)} className="mt-0.5 flex items-center gap-1 font-display text-2xl font-semibold">
-            <MapPin className="h-5 w-5 text-primary" /> Lisbon <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          <button onClick={() => setLocOpen(true)} className="mt-0.5 flex items-center gap-1.5 font-display text-2xl font-semibold hover:opacity-80 transition-opacity">
+            <MapPin className="h-5 w-5 text-primary" /> {city || "Lisbon"}
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
+              {location === "device" ? "Live GPS" : "Demo"}
+            </span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
         <Link to="/profile" aria-label="Profile" className="grid h-11 w-11 place-items-center rounded-full bg-emerald text-primary-foreground shadow-card">
@@ -63,10 +81,14 @@ function Discover() {
       {ready && location === "unset" && (
         <div className="mx-5 mt-4 animate-rise rounded-2xl bg-emerald p-4 text-primary-foreground shadow-card">
           <p className="flex items-center gap-2 font-semibold"><LocateFixed className="h-4 w-4" /> Find places around you</p>
-          <p className="mt-1 text-xs opacity-85">Allow location to see nearby landmarks, or try the demo set in central Lisbon.</p>
+          <p className="mt-1 text-xs opacity-85">Enable current location via GPS and Google Maps, or explore the demo set in Lisbon.</p>
           <div className="mt-3 flex gap-2">
-            <button onClick={useDevice} className="rounded-full bg-gold px-4 py-2 text-xs font-bold text-gold-foreground">Allow location</button>
-            <button onClick={() => update({ location: "demo" })} className="rounded-full border border-primary-foreground/40 px-4 py-2 text-xs font-bold">Use demo location</button>
+            <button onClick={handleUseCurrentLocation} disabled={locating} className="rounded-full bg-gold px-4 py-2 text-xs font-bold text-gold-foreground disabled:opacity-50">
+              {locating ? "Locating..." : "Use Current Location"}
+            </button>
+            <button onClick={handleUseDemoLocation} className="rounded-full border border-primary-foreground/40 px-4 py-2 text-xs font-bold">
+              Use Demo Location
+            </button>
           </div>
         </div>
       )}
@@ -138,14 +160,74 @@ function Discover() {
       )}
 
       {locOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-charcoal/50" onClick={() => setLocOpen(false)}>
-          <div className="w-full max-w-[440px] animate-rise rounded-t-3xl bg-background p-6" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Location">
-            <h2 className="text-xl font-semibold">Your location</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Roam's prototype covers Lisbon. Distances are measured from Baixa (demo).</p>
-            <p className="mt-3 text-xs font-semibold text-primary">Current: {location === "device" ? "Device location (demo distances)" : location === "demo" ? "Demo location — Baixa, Lisbon" : "Not set"}</p>
-            <div className="mt-5 space-y-2">
-              <button onClick={useDevice} className="w-full rounded-full bg-primary py-3 text-sm font-bold text-primary-foreground">Use my device location</button>
-              <button onClick={() => { update({ location: "demo" }); setLocOpen(false); toast("Using demo location: Baixa, Lisbon"); }} className="w-full rounded-full bg-secondary py-3 text-sm font-bold text-secondary-foreground">Use demo location</button>
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 sm:p-4 backdrop-blur-sm" onClick={() => setLocOpen(false)}>
+          <div className="w-full max-w-[440px] animate-rise rounded-t-3xl sm:rounded-3xl bg-background p-6 shadow-2xl border border-border" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Location">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold font-display">Choose Location</h2>
+              <button onClick={() => setLocOpen(false)} className="rounded-full p-1 text-muted-foreground hover:bg-muted">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">Select whether to use your live GPS location or explore the Lisbon demo.</p>
+
+            <div className="mt-4 space-y-3">
+              {/* Option 1: Live Current Location */}
+              <div className={`rounded-2xl border p-4 transition-all ${location === "device" ? "border-primary bg-primary/5 ring-2 ring-primary/20" : "border-border bg-card"}`}>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <LocateFixed className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold">Use Current Location</h3>
+                      <p className="text-[11px] text-muted-foreground">GPS & Google Maps Geocoding</p>
+                    </div>
+                  </div>
+                  {location === "device" && (
+                    <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">Active</span>
+                  )}
+                </div>
+
+                {location === "device" && resolvedAddress && (
+                  <div className="mt-2.5 rounded-xl bg-background/80 p-2.5 text-xs text-foreground border">
+                    <span className="font-semibold text-primary block">Detected Address:</span>
+                    <span className="text-muted-foreground">{resolvedAddress}</span>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleUseCurrentLocation}
+                  disabled={locating}
+                  className="mt-3 w-full rounded-full bg-primary py-2.5 text-xs font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {locating ? "Detecting location..." : location === "device" ? "Refresh GPS Location" : "Set Current Location"}
+                </button>
+              </div>
+
+              {/* Option 2: Demo Location */}
+              <div className={`rounded-2xl border p-4 transition-all ${location === "demo" ? "border-primary bg-primary/5 ring-2 ring-primary/20" : "border-border bg-card"}`}>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+                      <MapPin className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold">Demo Location</h3>
+                      <p className="text-[11px] text-muted-foreground">Baixa Pombalina, Lisbon</p>
+                    </div>
+                  </div>
+                  {location === "demo" && (
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-secondary-foreground">Active</span>
+                  )}
+                </div>
+
+                <button
+                  onClick={handleUseDemoLocation}
+                  className="mt-3 w-full rounded-full bg-secondary py-2.5 text-xs font-bold text-secondary-foreground hover:bg-secondary/80"
+                >
+                  {location === "demo" ? "Using Demo Location" : "Switch to Demo Location"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
