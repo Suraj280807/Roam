@@ -2,7 +2,11 @@
  * Reliably loads and compresses an image file into a base64 Data URL.
  * Includes multiple fallback strategies for maximum mobile (iOS / Android) compatibility.
  */
-export async function compressImage(file: File, maxDimension = 1200, quality = 0.75): Promise<string> {
+export async function compressImage(
+  file: File,
+  maxDimension = 1200,
+  quality = 0.75,
+): Promise<string> {
   // Strategy 1: URL.createObjectURL + HTMLCanvas (fastest, lowest memory overhead on mobile)
   try {
     return await compressUsingObjectUrl(file, maxDimension, quality);
@@ -26,7 +30,11 @@ export async function compressImage(file: File, maxDimension = 1200, quality = 0
   }
 }
 
-function compressUsingObjectUrl(file: File, maxDimension: number, quality: number): Promise<string> {
+function compressUsingObjectUrl(
+  file: File,
+  maxDimension: number,
+  quality: number,
+): Promise<string> {
   return new Promise((resolve, reject) => {
     let objectUrl = "";
     try {
@@ -96,7 +104,11 @@ function compressUsingObjectUrl(file: File, maxDimension: number, quality: numbe
   });
 }
 
-function compressUsingFileReader(file: File, maxDimension: number, quality: number): Promise<string> {
+function compressUsingFileReader(
+  file: File,
+  maxDimension: number,
+  quality: number,
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 

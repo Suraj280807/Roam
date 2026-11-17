@@ -11,8 +11,8 @@ import ramling from "@/assets/ramling.jpg";
 import cafeAmigos from "@/assets/cafe-amigos.png";
 import teaToastCo from "@/assets/tea-toast-co.png";
 
-export type Category = "Landmarks" | "History" | "Viewpoints" | "Food" | "Culture";
-export const CATEGORIES: Category[] = ["Landmarks", "History", "Viewpoints", "Food", "Culture"];
+export type Category = "Landmarks" | "History" | "Viewpoints" | "Food" | "Culture" | "Cafes" | "Restaurants" | "Hotels";
+export const CATEGORIES: Category[] = ["Landmarks", "History", "Viewpoints", "Food", "Culture", "Cafes", "Restaurants", "Hotels"];
 
 export interface Place {
   id: string;
@@ -30,6 +30,7 @@ export interface Place {
   hiddenGem?: boolean;
   featured?: boolean;
   map: { x: number; y: number };
+  coords?: { lat: number; lng: number } | undefined;
   qa: Record<string, string>;
 }
 
@@ -54,18 +55,19 @@ export const CURRENT_PLACES: Place[] = [
     facts: [
       "Sprawls across an expansive eco-friendly campus with modern university faculties.",
       "Features state-of-the-art sports facilities, hostels, amphitheaters, and research labs.",
-      "Known for vibrant annual tech fests, cultural concerts, and student gatherings."
+      "Known for vibrant annual tech fests, cultural concerts, and student gatherings.",
     ],
     featured: true,
     map: { x: 45, y: 35 },
+    coords: { lat: 16.746, lng: 74.3725 },
     qa: {
       "What is SGU best known for?":
         "Excellence in technology, management, modern student amenities, and high university placements.",
       "When is the best time to visit?":
         "Weekdays during daytime to witness the energetic campus atmosphere and central amenities.",
       "What can I see on campus?":
-        "Explore the iconic central building, lush tree-lined walkways, sports grounds, and vibrant student cafeterias."
-    }
+        "Explore the iconic central building, lush tree-lined walkways, sports grounds, and vibrant student cafeterias.",
+    },
   },
   {
     id: "ramling",
@@ -73,7 +75,7 @@ export const CURRENT_PLACES: Place[] = [
     area: "Hatkanangle, Kolhapur",
     category: "History",
     image: ramling,
-    distanceKm: 2.4,
+    distanceKm: 5.4,
     duration: "45 min – 1 hr",
     rating: 4.8,
     tagline: "Ancient cave temple dedicated to Lord Shiva with holy natural spring ponds.",
@@ -84,25 +86,26 @@ export const CURRENT_PLACES: Place[] = [
     facts: [
       "Features ancient stone kunds (tanks) filled with perennial, cool natural spring water.",
       "Surrounded by serene hill trails, offering tranquil panoramic viewpoints of the valley.",
-      "Draws thousands of pilgrims and celebratory processions during Mahashivratri."
+      "Draws thousands of pilgrims and celebratory processions during Mahashivratri.",
     ],
     featured: true,
     hiddenGem: true,
     map: { x: 65, y: 55 },
+    coords: { lat: 16.758, lng: 74.408 },
     qa: {
       "What is the story of Ramling?":
         "Believed to have been visited by Lord Rama in Treta Yuga, who carved and worshipped a Shiva lingam beside the natural stream.",
       "When should I visit?":
         "Mornings and late afternoons offer cool breezes, chanting echoes, and serene reflections in the temple water.",
       "What should I explore?":
-        "The inner rock shrine, the holy temple kunds, and the peaceful hillside stone walkways."
-    }
+        "The inner rock shrine, the holy temple kunds, and the peaceful hillside stone walkways.",
+    },
   },
   {
     id: "cafe-amigos",
     name: "Café Amigo's",
     area: "Near SGU Campus, Kolhapur",
-    category: "Food",
+    category: "Cafes",
     image: cafeAmigos,
     distanceKm: 1.2,
     duration: "30–45 min",
@@ -115,22 +118,23 @@ export const CURRENT_PLACES: Place[] = [
     facts: [
       "Famous for handcrafted cheesy burgers, peri-peri loaded fries, and signature shakes.",
       "Popular evening hangout hub for SGU students after classes and study sessions.",
-      "Features outdoor covered patio seating with great nightlife vibes."
+      "Features outdoor covered patio seating with great nightlife vibes.",
     ],
     featured: false,
     map: { x: 38, y: 42 },
+    coords: { lat: 16.7445, lng: 74.37 },
     qa: {
       "What are the top picks on the menu?":
         "Their Amigo's special burger, spicy cheese fries, hazelnut cold coffee, and paneer wraps.",
       "What is the vibe like?":
-        "Casual, youthful, and lively with outdoor canopy seating that glows nicely in the evening."
-    }
+        "Casual, youthful, and lively with outdoor canopy seating that glows nicely in the evening.",
+    },
   },
   {
     id: "tea-toast-co",
     name: "The Tea Toast Co.",
     area: "Campus Promenade, Kolhapur",
-    category: "Food",
+    category: "Cafes",
     image: teaToastCo,
     distanceKm: 1.5,
     duration: "20–35 min",
@@ -143,17 +147,76 @@ export const CURRENT_PLACES: Place[] = [
     facts: [
       "Famous for piping hot masala tea served in traditional clay kulhads.",
       "Serves an extensive menu of savory melt-in-the-mouth toasts, from cheese chilli to garlic herb.",
-      "Spacious glass pavilion design with breezy patio seating."
+      "Spacious glass pavilion design with breezy patio seating.",
     ],
     featured: true,
     map: { x: 50, y: 40 },
+    coords: { lat: 16.7455, lng: 74.3715 },
     qa: {
       "What are the must-try items?":
         "Order the Signature Kulhad Chai, Cheese Chilli Toast, and fresh potato wedges.",
       "Is it good for quick catch-ups?":
-        "Perfect for quick study chats, breakfast toasties, or a relaxing evening tea break."
-    }
-  }
+        "Perfect for quick study chats, breakfast toasties, or a relaxing evening tea break.",
+    },
+  },
+  {
+    id: "hotel-dehati",
+    name: "Hotel Dehati Kolhapuri Thali",
+    area: "C.S.T. Road, Kolhapur",
+    category: "Restaurants",
+    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
+    distanceKm: 4.8,
+    duration: "1 hr",
+    rating: 4.9,
+    tagline: "Legendary authentic Kolhapuri dining with iconic Tambda & Pandhra Rassa.",
+    history:
+      "Dehati is an institution in Kolhapur, preserving traditional Maratha spices, slow-cooked curries, and time-honored thali culinary secrets passed down through generations.",
+    culture:
+      "A bustling, heartwarming celebration of Kolhapur's rich culinary pride where steaming bowls of red and white broths accompany fragrant mutton and bhakri.",
+    facts: [
+      "Famous for its fiery Tambda Rassa (red curry) and comforting Pandhra Rassa (white coconut broth).",
+      "Regularly featured in national travel documentaries and culinary guides.",
+      "Served on traditional brass thalis with fresh jowar and bajra bhakris.",
+    ],
+    featured: true,
+    map: { x: 52, y: 58 },
+    coords: { lat: 16.705, lng: 74.243 },
+    qa: {
+      "What should I order?":
+        "The Special Kolhapuri Mutton Thali served with unlimited Tambda and Pandhra Rassa is the signature experience.",
+      "Is it very spicy?":
+        "The heat is aromatic and rich rather than overwhelming; the Pandhra Rassa provides soothing balance.",
+    },
+  },
+  {
+    id: "sayaji-hotel",
+    name: "Sayaji Hotel Kolhapur",
+    area: "Old Pune-Bangalore Hwy, Kolhapur",
+    category: "Hotels",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+    distanceKm: 5.2,
+    duration: "Overnight",
+    rating: 4.8,
+    tagline: "5-star luxury hospitality, rooftop dining and lavish suites overlooking Kolhapur.",
+    history:
+      "Sayaji stands as the hallmark of premier luxury lodging in Southern Maharashtra, blending contemporary business comforts with heartfelt regional hospitality.",
+    culture:
+      "A stylish retreat for international travelers and weekend explorers featuring rooftop cocktail lounges, spa sanctuaries, and celebrated barbecue buffets.",
+    facts: [
+      "Boasts panoramic city viewpoints from its acclaimed rooftop restaurant.",
+      "Features lavish deluxe suites, swimming pool, and modern fitness wellness facilities.",
+      "Conveniently situated right along the main travel corridor connecting Pune and Goa.",
+    ],
+    featured: false,
+    map: { x: 48, y: 62 },
+    coords: { lat: 16.711, lng: 74.258 },
+    qa: {
+      "What amenities are available?":
+        "Rooftop infinity views, multiple dining restaurants, swimming pool, high-speed WiFi, and 24/7 concierge.",
+      "How close is it to central Kolhapur?":
+        "Just a short 10-minute drive to Mahalaxmi Temple and Rankala Lake.",
+    },
+  },
 ];
 
 /**
@@ -181,6 +244,7 @@ export const DEMO_PLACES: Place[] = [
     ],
     featured: true,
     map: { x: 12, y: 72 },
+    coords: { lat: 38.6916, lng: -9.216 },
     qa: {
       "Why was it built?":
         "Belém Tower was commissioned by King Manuel I to defend Lisbon's harbour. Its cannons covered the river entrance, and it doubled as a symbolic farewell point for ships bound for Africa, India and Brazil.",
@@ -211,6 +275,7 @@ export const DEMO_PLACES: Place[] = [
     ],
     featured: true,
     map: { x: 16, y: 68 },
+    coords: { lat: 38.6979, lng: -9.2067 },
     qa: {
       "Who is buried here?":
         "Explorer Vasco da Gama, poet Luís de Camões, and writer Fernando Pessoa (in the cloister). Several Portuguese monarchs also rest in the chancel.",
@@ -241,6 +306,7 @@ export const DEMO_PLACES: Place[] = [
     ],
     featured: true,
     map: { x: 62, y: 44 },
+    coords: { lat: 38.7118, lng: -9.1302 },
     qa: {
       "Where can I hear real fado?":
         "Avoid tourist-trap dinner shows on main streets. Seek small tascas like Mesa de Frades or A Baiuca where locals sing spontaneously ('fado vadio').",
@@ -270,6 +336,7 @@ export const DEMO_PLACES: Place[] = [
       "Archaeologists have uncovered traces of 7th-century BC Iron Age settlements on this hill.",
     ],
     map: { x: 54, y: 38 },
+    coords: { lat: 38.7139, lng: -9.1335 },
     qa: {
       "Is the view worth the climb?":
         "Absolutely — from the ramparts you can see the Tagus estuary, the bridge, downtown Baixa and across to the Monsanto forest park.",
@@ -300,6 +367,7 @@ export const DEMO_PLACES: Place[] = [
     ],
     hiddenGem: true,
     map: { x: 32, y: 66 },
+    coords: { lat: 38.7037, lng: -9.1788 },
     qa: {
       "When is it busiest?":
         "Weekend afternoons and Sunday market days. Visit on a weekday morning for a calmer stroll.",
@@ -330,6 +398,7 @@ export const DEMO_PLACES: Place[] = [
     ],
     hiddenGem: true,
     map: { x: 58, y: 26 },
+    coords: { lat: 38.7198, lng: -9.1317 },
     qa: {
       "When should I go?":
         "Arrive about 30 minutes before sunset to find a spot on the wall. Bring a light jacket — it gets breezy at the top.",
@@ -343,11 +412,11 @@ export const DEMO_PLACES: Place[] = [
     id: "pasteis-belem",
     name: "Pastéis de Belém",
     area: "Belém",
-    category: "Food",
+    category: "Cafes",
     image: pasteis,
     distanceKm: 6.0,
     duration: "30–45 min",
-    rating: 4.7,
+    rating: 4.8,
     tagline: "Custard tarts from a secret recipe guarded since 1837.",
     history:
       "After the 1834 dissolution of religious orders, monks from Jerónimos sold their pastry recipe to a local sugar refinery, which opened this bakery in 1837.",
@@ -360,6 +429,7 @@ export const DEMO_PLACES: Place[] = [
     ],
     hiddenGem: true,
     map: { x: 22, y: 76 },
+    coords: { lat: 38.6974, lng: -9.2033 },
     qa: {
       "How do I skip the queue?":
         "The takeaway line moves fast, but walk inside to the seated rooms — there's often no wait to sit and order at the table.",
@@ -369,9 +439,103 @@ export const DEMO_PLACES: Place[] = [
         "Their flaky, caramelised crust and silky custard come from a recipe unchanged since 1837 — a direct link to the monks of Jerónimos.",
     },
   },
+  {
+    id: "cafe-brasileira",
+    name: "Café A Brasileira",
+    area: "Chiado, Lisbon",
+    category: "Cafes",
+    image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
+    distanceKm: 0.6,
+    duration: "30–45 min",
+    rating: 4.7,
+    tagline: "Historic Art Deco café where poet Fernando Pessoa spent afternoons writing.",
+    history:
+      "Opened in 1905 to import Brazilian coffee beans, A Brasileira quickly became the intellectual epicentre of Lisbon's modernist artists and writers.",
+    culture:
+      "A grand room with carved oak paneling, mirrored walls, and brass accents. Travelers sit outside beside the life-sized bronze statue of Fernando Pessoa.",
+    facts: [
+      "Coined the Lisbon slang phrase 'Bica' (Beba Isto Com Açúcar) for espresso.",
+      "The bronze statue of Fernando Pessoa on the terrace is one of Lisbon's most photographed icons.",
+      "Preserves original 1920s Art Deco fixtures and painted canvas ceiling art.",
+    ],
+    featured: false,
+    map: { x: 44, y: 50 },
+    coords: { lat: 38.7107, lng: -9.1422 },
+    qa: {
+      "Who was Fernando Pessoa?":
+        "Portugal's legendary 20th-century poet who frequented the café and now sits cast in bronze on its patio.",
+      "What should I order?":
+        "A classic 'bica' espresso alongside a freshly baked pastry.",
+    },
+  },
+  {
+    id: "timeout-market",
+    name: "Time Out Market Lisboa",
+    area: "Cais do Sodré, Lisbon",
+    category: "Restaurants",
+    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
+    distanceKm: 1.1,
+    duration: "1–1.5 hrs",
+    rating: 4.8,
+    tagline: "Gourmet culinary hall featuring 26 top Portuguese chefs and specialty dishes.",
+    history:
+      "Housed in the historic 1892 Mercado da Ribeira, Time Out curated Portugal's very finest restaurants under one roof in 2014.",
+    culture:
+      "Communal wooden tables beneath soaring iron girders, alive with laughter, craft beer, pastel de nata workshops, and Michelin-starred tasting plates.",
+    facts: [
+      "Curates only venues that received 4 or 5 stars from independent food critics.",
+      "Features live fado, cooking workshops, and local wine tasting bars.",
+      "Attracts over 3 million visitors annually as Lisbon's #1 culinary hotspot.",
+    ],
+    featured: true,
+    map: { x: 38, y: 62 },
+    coords: { lat: 38.7071, lng: -9.1457 },
+    qa: {
+      "How does ordering work?":
+        "Browse the counters around the perimeter, order your dishes, take a buzzer, and sit at the communal center tables.",
+      "What are the best stalls?":
+        "Try the slow-roasted suckling pig sandwich from Henrique Sá Pessoa or sea bass tartar from Tartar-ia.",
+    },
+  },
+  {
+    id: "tivoli-liberdade",
+    name: "Tivoli Avenida Liberdade Lisboa",
+    area: "Avenida da Liberdade, Lisbon",
+    category: "Hotels",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+    distanceKm: 1.4,
+    duration: "Overnight",
+    rating: 4.9,
+    tagline: "Grand 5-star heritage hotel with subtropical gardens and a glamorous rooftop bar.",
+    history:
+      "Welcoming guests since 1933, the Tivoli has hosted royalty, Hollywood legends, and statesmen along Lisbon's most fashionable tree-lined boulevard.",
+    culture:
+      "Old-world European glamour combined with modern luxury, featuring the famous SEEN sky bar with sunset views over the castle and river.",
+    facts: [
+      "Hidden oasis with a heated round pool set in lush 1930s subtropical gardens.",
+      "The rooftop SEEN Sky Bar is famous for inventive cocktails and panoramic sunset vistas.",
+      "Located on Lisbon's high-fashion designer shopping boulevard.",
+    ],
+    featured: false,
+    map: { x: 42, y: 30 },
+    coords: { lat: 38.7205, lng: -9.1462 },
+    qa: {
+      "Is the rooftop bar open to non-guests?":
+        "Yes, the SEEN Rooftop is open for dinner and evening cocktails with reservations recommended.",
+      "Where is it situated?":
+        "Directly on Avenida da Liberdade, an easy 10-minute stroll to Rossio square and Baixa.",
+    },
+  },
 ];
 
 export const ALL_PLACES: Place[] = [...CURRENT_PLACES, ...DEMO_PLACES];
+
+const DYNAMIC_PLACES_REGISTRY = new Map<string, Place>();
+ALL_PLACES.forEach((p) => DYNAMIC_PLACES_REGISTRY.set(p.id, p));
+
+export function registerDynamicPlaces(places: Place[]) {
+  places.forEach((p) => DYNAMIC_PLACES_REGISTRY.set(p.id, p));
+}
 
 /**
  * Returns places for the given location mode:
@@ -382,13 +546,13 @@ export function getPlacesForLocation(mode: "demo" | "device" | "unset"): Place[]
   if (mode === "demo") {
     return DEMO_PLACES;
   }
-  // Default to CURRENT_PLACES for current location / device mode
   return CURRENT_PLACES;
 }
 
 // Global lookup and defaults
 export const PLACES = ALL_PLACES;
-export const getPlace = (id: string) => ALL_PLACES.find((p) => p.id === id);
+export const getPlace = (id: string) =>
+  DYNAMIC_PLACES_REGISTRY.get(id) || ALL_PLACES.find((p) => p.id === id);
 
 export const GENERIC_QUESTIONS = ["Tell me a story", "Fun fact?", "Nearby food?"];
 
@@ -396,10 +560,9 @@ export function demoAnswer(place: Place, question: string): string {
   const exact = place.qa[question];
   if (exact) return exact;
   const q = question.toLowerCase();
-  if (q.includes("story") || q.includes("history") || q.includes("old"))
-    return place.history;
+  if (q.includes("story") || q.includes("history") || q.includes("old")) return place.history;
   if (q.includes("fact") || q.includes("interesting"))
-    return place.facts[Math.floor(Math.random() * place.facts.length)];
+    return place.facts[Math.floor(Math.random() * place.facts.length)] || place.tagline;
   if (q.includes("food") || q.includes("eat"))
     return `Near ${place.name}, check out Café Amigo's and The Tea Toast Co. for delicious burgers, teas, and snacks.`;
   if (q.includes("culture") || q.includes("meaning") || q.includes("signific"))

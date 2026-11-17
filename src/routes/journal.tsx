@@ -1,8 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef, useMemo, useEffect } from "react";
-import { Bookmark, PenLine, Trash2, Camera, Plus, X, Image as ImageIcon, MapPin, Maximize2 } from "lucide-react";
+import {
+  Bookmark,
+  PenLine,
+  Trash2,
+  Camera,
+  Plus,
+  X,
+  Image as ImageIcon,
+  MapPin,
+  Maximize2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { AppShell, ScreenHeader } from "@/components/AppShell";
+import { AuthGuard } from "@/components/AuthGuard";
 import { RowCard } from "@/components/PlaceCard";
 import { getPlace, getPlacesForLocation } from "@/lib/places";
 import { fmtDate, useStore, type PhotoMemory } from "@/lib/store";
@@ -12,16 +23,40 @@ export const Route = createFileRoute("/journal")({
   head: () => ({
     meta: [
       { title: "Travel Journal & Memories — Roam" },
-      { name: "description", content: "Your saved places, visits and travel photo memories in one journal." },
+      {
+        name: "description",
+        content: "Your saved places, visits and travel photo memories in one journal.",
+      },
       { property: "og:title", content: "Travel Journal & Memories — Roam" },
-      { property: "og:description", content: "Store photo memories, notes and stamps from every place you explore." },
+      {
+        property: "og:description",
+        content: "Store photo memories, notes and stamps from every place you explore.",
+      },
     ],
   }),
-  component: Journal,
+  component: JournalPage,
 });
 
+function JournalPage() {
+  return (
+    <AuthGuard message="Create a free account or sign in to record personal travel notes, save destination bookmarks, and capture photo memories.">
+      <Journal />
+    </AuthGuard>
+  );
+}
+
 function Journal() {
-  const { saved, stamps, notes, memories = [], location, addNote, deleteNote, addPhotoMemory, deletePhotoMemory } = useStore();
+  const {
+    saved,
+    stamps,
+    notes,
+    memories = [],
+    location,
+    addNote,
+    deleteNote,
+    addPhotoMemory,
+    deletePhotoMemory,
+  } = useStore();
   const places = useMemo(() => getPlacesForLocation(location), [location]);
   const [tab, setTab] = useState<"memories" | "saved">("memories");
 
@@ -66,9 +101,11 @@ function Journal() {
       setPhotoImage(compressed);
       setAddingPhoto(true);
       toast.success("Photo loaded!");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Photo selection error:", err);
-      toast.error(err?.message || "Could not load this photo. Please try another image.");
+      const msg =
+        err instanceof Error ? err.message : "Could not load this photo. Please try another image.";
+      toast.error(msg);
     } finally {
       setIsProcessingImage(false);
       if (e.target) e.target.value = "";
@@ -85,9 +122,11 @@ function Journal() {
       const compressed = await compressImage(file);
       setNoteImage(compressed);
       toast.success("Photo attached to note!");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Note photo error:", err);
-      toast.error(err?.message || "Could not load this photo. Please try another image.");
+      const msg =
+        err instanceof Error ? err.message : "Could not load this photo. Please try another image.";
+      toast.error(msg);
     } finally {
       setIsProcessingImage(false);
       if (e.target) e.target.value = "";
@@ -185,13 +224,21 @@ function Journal() {
           {writing && (
             <div className="animate-rise rounded-2xl bg-card p-4 shadow-card border border-border">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-primary">Write Note</span>
-                <button onClick={() => setWriting(false)} className="text-muted-foreground hover:text-foreground">
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                  Write Note
+                </span>
+                <button
+                  onClick={() => setWriting(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
-              <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground" htmlFor="note-place">
+              <label
+                className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+                htmlFor="note-place"
+              >
                 Place
               </label>
               <select
@@ -220,7 +267,11 @@ function Journal() {
               {/* Attached Note Image Preview */}
               {noteImage && (
                 <div className="relative mt-2 inline-block">
-                  <img src={noteImage} alt="Attachment" className="h-20 w-20 rounded-xl object-cover border" />
+                  <img
+                    src={noteImage}
+                    alt="Attachment"
+                    className="h-20 w-20 rounded-xl object-cover border"
+                  />
                   <button
                     onClick={() => setNoteImage(null)}
                     className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-white shadow-sm"
@@ -297,7 +348,9 @@ function Journal() {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-hover:scale-110">
                   <Camera className="h-6 w-6" />
                 </div>
-                <p className="mt-3 font-display text-sm font-semibold text-foreground">Store your travel photos</p>
+                <p className="mt-3 font-display text-sm font-semibold text-foreground">
+                  Store your travel photos
+                </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Tap to capture or upload photos from your adventures into this album.
                 </p>
@@ -361,12 +414,16 @@ function Journal() {
 
           {/* TIMELINE SECTION (NOTES & STAMPS) */}
           <section className="pt-2">
-            <h3 className="mb-3 font-display text-sm font-bold text-foreground">Timeline & Notes</h3>
+            <h3 className="mb-3 font-display text-sm font-bold text-foreground">
+              Timeline & Notes
+            </h3>
 
             {notes.length === 0 && visited.length === 0 && (
               <div className="rounded-2xl border border-dashed border-border p-6 text-center">
                 <p className="font-display text-sm font-semibold">No notes or stamps yet</p>
-                <p className="mt-1 text-xs text-muted-foreground">Collect a stamp while exploring or write your first note.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Collect a stamp while exploring or write your first note.
+                </p>
                 <button
                   onClick={() => setWriting(true)}
                   className="mt-3 rounded-full bg-primary px-3.5 py-1.5 text-xs font-bold text-primary-foreground"
@@ -441,7 +498,11 @@ function Journal() {
                 return (
                   <li key={s.placeId} className="relative">
                     <span className="absolute -left-[27px] top-3 h-3 w-3 rounded-full border-2 border-background bg-primary" />
-                    <Link to="/place/$id" params={{ id: p.id }} className="flex gap-3 rounded-2xl bg-accent p-3">
+                    <Link
+                      to="/place/$id"
+                      params={{ id: p.id }}
+                      className="flex gap-3 rounded-2xl bg-accent p-3"
+                    >
                       <img src={p.image} alt="" className="h-14 w-14 rounded-xl object-cover" />
                       <div>
                         <p className="text-[11px] font-bold uppercase tracking-wider text-accent-foreground">
@@ -515,8 +576,12 @@ function Journal() {
                   className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/40 p-6 text-center cursor-pointer hover:border-primary/50 transition-colors"
                 >
                   <Camera className="h-8 w-8 text-primary mb-2" />
-                  <span className="text-xs font-semibold text-foreground">Tap to select or take photo</span>
-                  <span className="text-[10px] text-muted-foreground mt-0.5">JPG, PNG, WebP supported</span>
+                  <span className="text-xs font-semibold text-foreground">
+                    Tap to select or take photo
+                  </span>
+                  <span className="text-[10px] text-muted-foreground mt-0.5">
+                    JPG, PNG, WebP supported
+                  </span>
                 </div>
               )}
 
@@ -599,7 +664,9 @@ function Journal() {
                     <MapPin className="h-3.5 w-3.5" /> {getPlace(viewingPhoto.placeId)?.name}
                   </span>
                 )}
-                <span className="text-[11px] text-muted-foreground">{fmtDate(viewingPhoto.date)}</span>
+                <span className="text-[11px] text-muted-foreground">
+                  {fmtDate(viewingPhoto.date)}
+                </span>
               </div>
 
               {viewingPhoto.caption && (

@@ -1,4 +1,6 @@
-export const GOOGLE_MAPS_API_KEY = "AIzaSyAtNv_a35ZYkYKrgYaOzNvtxpllq7bZg50";
+export const GOOGLE_MAPS_API_KEY =
+  (import.meta as unknown as { env: Record<string, string> }).env?.["VITE_MAPS_API_KEY"] ||
+  "AIzaSyAtNv_a35ZYkYKrgYaOzNvtxpllq7bZg50";
 
 export const DEMO_LOCATION = {
   city: "Lisbon",
@@ -12,6 +14,8 @@ export interface LocationResult {
   address: string;
   coords: { lat: number; lng: number };
   source: "google" | "fallback" | "demo" | "ip";
+  parentCity?: string;
+  locality?: string;
 }
 
 /**
@@ -44,7 +48,7 @@ export async function fetchCurrentPosition(): Promise<{ lat: number; lng: number
         enableHighAccuracy: true,
         timeout: 8000,
         maximumAge: 30000,
-      }
+      },
     );
   });
 }
@@ -54,11 +58,11 @@ export async function fetchCurrentPosition(): Promise<{ lat: number; lng: number
  */
 export async function reverseGeocodeWithGoogle(
   lat: number,
-  lng: number
-): Promise<{ city: string; address: string } | null> {
+  lng: number,
+): Promise<{ city: string; address: string; parentCity?: string; locality?: string } | null> {
   try {
     const res = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`,
     );
     if (!res.ok) return null;
     const data = await res.json();
@@ -67,23 +71,33 @@ export async function reverseGeocodeWithGoogle(
       const result = data.results[0];
       const address = result.formatted_address || "Current Location";
 
-      let city = "";
+      let locality = "";
+      let primaryCity = "";
+
       for (const comp of result.address_components || []) {
-        if (comp.types.includes("locality")) {
-          city = comp.long_name;
-          break;
+        if (comp.types.includes("sublocality") || comp.types.includes("neighborhood")) {
+          locality = comp.long_name;
+        } else if (comp.types.includes("locality")) {
+          primaryCity = comp.long_name;
         } else if (
-          !city &&
+          !primaryCity &&
           (comp.types.includes("administrative_area_level_2") ||
             comp.types.includes("administrative_area_level_1"))
         ) {
-          city = comp.long_name;
+          primaryCity = comp.long_name;
         }
       }
 
+      const displayCity =
+        locality && primaryCity && locality.toLowerCase() !== primaryCity.toLowerCase()
+          ? `${locality}, ${primaryCity}`
+          : primaryCity || locality || "Current Location";
+
       return {
-        city: city || "Current Location",
+        city: displayCity,
         address,
+        parentCity: primaryCity || locality,
+        locality: locality || primaryCity,
       };
     }
     return null;
@@ -95,27 +109,54 @@ export async function reverseGeocodeWithGoogle(
 
 /**
  * Free reverse geocoding fallback in case Google Maps billing is pending.
+ * Intelligent extraction of locality (e.g. Pirwadi) and main city/district (e.g. Satara).
  */
 export async function reverseGeocodeFallback(
   lat: number,
-  lng: number
-): Promise<{ city: string; address: string }> {
+  lng: number,
+): Promise<{ city: string; address: string; parentCity?: string; locality?: string }> {
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=14`,
-      { headers: { "Accept-Language": "en" } }
+      { headers: { "Accept-Language": "en", "User-Agent": "RoamTravelCompanion/2.0" } },
     );
     if (res.ok) {
       const data = await res.json();
-      const city =
-        data.address?.city ||
-        data.address?.town ||
-        data.address?.village ||
-        data.address?.suburb ||
-        data.address?.state ||
-        "Nearby";
+      const addr = data.address || {};
+
+      const locality =
+        addr.suburb ||
+        addr.neighbourhood ||
+        addr.village ||
+        addr.residential ||
+        addr.hamlet ||
+        "";
+
+      const primaryCity =
+        addr.city ||
+        addr.town ||
+        addr.municipality ||
+        addr.county ||
+        addr.state_district ||
+        addr.district ||
+        "";
+
+      const state = addr.state || "";
+
+      let displayCity = "";
+      if (locality && primaryCity && locality.toLowerCase() !== primaryCity.toLowerCase()) {
+        displayCity = `${locality}, ${primaryCity}`;
+      } else {
+        displayCity = primaryCity || locality || state || "Current Location";
+      }
+
       const address = data.display_name || `Lat: ${lat.toFixed(3)}, Lng: ${lng.toFixed(3)}`;
-      return { city, address };
+      return {
+        city: displayCity,
+        address,
+        parentCity: primaryCity || locality || state,
+        locality: locality || primaryCity,
+      };
     }
   } catch (e) {
     console.warn("Fallback geocoding notice:", e);
@@ -135,14 +176,21 @@ export async function resolveIpLocation(): Promise<LocationResult | null> {
     const res = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client");
     if (res.ok) {
       const data = await res.json();
-      const city = data.city || data.locality || data.principalSubdivision || "Current Area";
+      const locality = data.locality || "";
+      const primaryCity = data.city || data.principalSubdivision || "Current Area";
       const country = data.countryName || "";
-      const address = `${city}${country ? `, ${country}` : ""} (Network Location)`;
+      const displayCity =
+        locality && primaryCity && locality.toLowerCase() !== primaryCity.toLowerCase()
+          ? `${locality}, ${primaryCity}`
+          : primaryCity;
+      const address = `${displayCity}${country ? `, ${country}` : ""} (Network Location)`;
       const lat = Number(data.latitude) || 0;
       const lng = Number(data.longitude) || 0;
       if (lat !== 0 || lng !== 0) {
         return {
-          city,
+          city: displayCity,
+          parentCity: primaryCity,
+          locality,
           address,
           coords: { lat, lng },
           source: "ip",
@@ -162,6 +210,7 @@ export async function resolveIpLocation(): Promise<LocationResult | null> {
       const address = `${city}${country ? `, ${country}` : ""} (Network Location)`;
       return {
         city,
+        parentCity: city,
         address,
         coords: { lat: Number(data.latitude), lng: Number(data.longitude) },
         source: "ip",
@@ -187,6 +236,8 @@ export async function resolveCurrentLocation(): Promise<LocationResult> {
       return {
         coords,
         city: googleResult.city,
+        parentCity: googleResult.parentCity,
+        locality: googleResult.locality,
         address: googleResult.address,
         source: "google",
       };
@@ -197,10 +248,12 @@ export async function resolveCurrentLocation(): Promise<LocationResult> {
     return {
       coords,
       city: fallbackResult.city,
+      parentCity: fallbackResult.parentCity,
+      locality: fallbackResult.locality,
       address: fallbackResult.address,
       source: "fallback",
     };
-  } catch (gpsError: any) {
+  } catch (gpsError: unknown) {
     console.warn("GPS unavailable or permission denied, using IP fallback:", gpsError);
 
     // If GPS was blocked or failed, try IP Geolocation so mobile users still get their location!

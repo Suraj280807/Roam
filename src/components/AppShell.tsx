@@ -22,7 +22,10 @@ export function AppShell({ children, nav = true }: { children: ReactNode; nav?: 
 
 function BottomNav() {
   return (
-    <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[440px] px-4 pb-4 md:absolute">
+    <nav
+      aria-label="Primary"
+      className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[440px] px-4 pb-4 md:absolute"
+    >
       <div className="flex items-center justify-around rounded-full bg-charcoal px-2 py-2 shadow-float">
         {NAV.map(({ to, label, icon: Icon }) => (
           <Link
@@ -40,11 +43,23 @@ function BottomNav() {
   );
 }
 
-export function ScreenHeader({ title, subtitle, right }: { title: string; subtitle?: string; right?: ReactNode }) {
+export function ScreenHeader({
+  title,
+  subtitle,
+  right,
+}: {
+  title: string;
+  subtitle?: string;
+  right?: ReactNode;
+}) {
   return (
     <header className="flex items-end justify-between px-5 pb-4 pt-8">
       <div>
-        {subtitle && <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{subtitle}</p>}
+        {subtitle && (
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            {subtitle}
+          </p>
+        )}
         <h1 className="mt-1 text-3xl font-semibold">{title}</h1>
       </div>
       {right}

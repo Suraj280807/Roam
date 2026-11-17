@@ -76,7 +76,7 @@ The technology stack depends on the current implementation and integrations.
 | AI Insights     | AI APIs                            |
 | Data Storage    | To be determined by implementation |
 
-*Note: This table describes the intended web prototype stack and planned integrations. Update it as the implementation evolves; not every listed service is necessarily integrated yet.*
+_Note: This table describes the intended web prototype stack and planned integrations. Update it as the implementation evolves; not every listed service is necessarily integrated yet._
 
 ---
 
